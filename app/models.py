@@ -22,7 +22,7 @@ class Common:
     )
 
 
-class Category(Common,Model):
+class Category(Common, Model):
     __tablename__ = 'categories'
     id = Column(
         BigInteger,
@@ -49,7 +49,7 @@ class Pitch(Model, Common):
         ForeignKey('users.id'),
         nullable=False
     )
-    category_id =Column(
+    category_id = Column(
         BigInteger,
         ForeignKey('categories.id'),
         nullable=False
@@ -96,7 +96,7 @@ class User(Model, Common):
     )
 
 
-class Comment(Model,Common):
+class Comment(Model, Common):
     __tablename__ = 'comments'
     id = Column(
         BigInteger,
@@ -118,7 +118,7 @@ class Comment(Model,Common):
     )
 
 
-class Action(Common,Model):
+class Action(Common, Model):
     __tablename__ = 'actions'
     id = Column(
         BigInteger,
@@ -140,7 +140,7 @@ class Action(Common,Model):
     )
 
 
-class ProfilePicture(Common,Model):
+class ProfilePicture(Common, Model):
     __tablename__ = 'profile_pictures'
     id = Column(
         BigInteger,
