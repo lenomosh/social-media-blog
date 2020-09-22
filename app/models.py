@@ -67,8 +67,8 @@ class Pitch(Model, Common):
         uselist=False
     )
     actions = Relationship(
-        'Actions',
-        lazy=True
+        'Action',
+        lazy=True,
     )
 
 
@@ -152,6 +152,6 @@ class ProfilePicture(Common, Model):
     )
     user_id = Column(
         BigInteger,
-        Relationship('users.id'),
+        ForeignKey('users.id'),
         nullable=False
     )
