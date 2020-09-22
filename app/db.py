@@ -9,3 +9,5 @@ ForeignKey = db.ForeignKey
 BigInteger = db.BigInteger
 Model = db.Model
 Text = db.Text
+session = db.session
+

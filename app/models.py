@@ -8,10 +8,13 @@ from app.db import (
     ForeignKey,
     Model,
     Relationship)
+# import sys
+# sys.setrecursionlimit(10**5)
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 
 
-class Common:
+class Common(SerializerMixin):
     CREATED_AT = Column(
         TIMESTAMP,
         default=datetime.utcnow()
@@ -62,7 +65,7 @@ class Pitch(Model, Common):
     )
     category = Relationship(
         'Category',
-        backref='pitches',
+        backref='category_pitches',
         lazy=True,
         uselist=False
     )
@@ -70,6 +73,7 @@ class Pitch(Model, Common):
         'Action',
         lazy=True,
     )
+    serialize_only = ( 'id','user_id','content','category_id',)
 
 
 class User(Model, Common):
