@@ -1,7 +1,7 @@
 from app.api import api
 from flask import request, jsonify
 from app.db import session
-from app.models import Pitch, Comment
+from app.models import Pitch, Comment,Action
 
 
 # Pitch CRUD ###########################################
@@ -80,3 +80,38 @@ def comment_delete(comment_id):
     session.delete(comment)
     session.commit()
     return jsonify(comment.to_dict())
+
+# Comment CRUD ###########################################
+
+# Actions CRUD ###########################################
+@api.route('/action',methods=("POST",))
+def action_create():
+    # action type
+    # 1 - like
+    # 2 - dislike
+    req_action = request.get_json()
+    action = Action(**req_action)
+    session.add(action)
+    session.commit()
+    return jsonify(action.to_dict())
+
+@api.route('/action',methods=('GET',))
+def action_index():
+    actions = Action.query.all()
+    json_actions =[]
+    for action in actions:
+        json_actions.append(action.to_dict())
+    return jsonify(json_actions)
+
+@api.route('/action/<int:action_id>',methods=("GET",))
+def action_read(action_id):
+    action = Action.query.get(action_id)
+    return jsonify(action.to_dict())
+
+@api.route('/action/<int:action_id>',methods=("DELETE",))
+def action_delete(action_id):
+    action = Action.query.get(action_id)
+    session.delete(action)
+    session.commit()
+    return jsonify(action.to_dict())
+
