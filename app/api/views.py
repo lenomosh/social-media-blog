@@ -1,7 +1,7 @@
 from app.api import api
 from flask import request, jsonify
-from app.db import session
-from app.models import Pitch, Comment,Action
+from app.db import session,add,commit,delete
+from app.models import Pitch, Comment,Action,Category
 
 
 # Pitch CRUD ###########################################
@@ -83,7 +83,7 @@ def comment_delete(comment_id):
 
 # Comment CRUD ###########################################
 
-# Actions CRUD ###########################################
+# Action CRUD ###########################################
 @api.route('/action',methods=("POST",))
 def action_create():
     # action type
@@ -115,3 +115,35 @@ def action_delete(action_id):
     session.commit()
     return jsonify(action.to_dict())
 
+# Action CRUD ###########################################
+
+
+# Category CRUD ###########################################
+@api.route('/category',methods=("POST",))
+def category_create():
+    req_category = request.get_json()
+    category = Category(**req_category)
+    add(category)
+    commit()
+    return jsonify(category.to_dict())
+
+@api.route('/category',methods=("GET",))
+def category_index():
+    categories = Category.query.all()
+    json_categories = []
+    for category in categories:
+        json_categories.append(category.to_dict())
+
+    return jsonify(json_categories)
+
+@api.route('/category/<int:category_id>',methods=("GET",))
+def category_read(category_id):
+    category = Category.query.get(category_id)
+    return jsonify(category.to_dict())
+
+@api.route('/category/<int:category_id>',methods=("DELETE",))
+def category_delete(category_id):
+    category = Category.query.get(category_id)
+    delete(category)
+    commit()
+    return jsonify(category.to_dict())
