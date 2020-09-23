@@ -29,8 +29,13 @@ def pitch_all():
     return jsonify(json_pitches)
 
 @api.route('/pitch/<int:id>',methods=['DELETE'])
-def delete_pitch(id):
+def pitch_delete(id):
     pitch = Pitch.query.get(id)
     session.delete(pitch)
     session.commit()
     return jsonify(pitch.to_dict())
+
+@api.route('/pitch/<int:id>',methods=['GET'])
+def pitch_view(id):
+    pitch = Pitch.query.get(id)
+    return pitch.to_dict()
