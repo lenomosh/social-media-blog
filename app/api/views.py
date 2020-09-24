@@ -1,7 +1,8 @@
+from app import photos
 from app.api import api
-from flask import request, jsonify
-from app.db import session,add,commit,delete
-from app.models import Pitch, Comment,Action,Category
+from flask import request, jsonify, abort, send_from_directory,current_app
+from app.db import session, add, commit, delete
+from app.models import Pitch, Comment, Action, Category, User, ProfilePicture
 
 
 # Pitch CRUD ###########################################
@@ -74,17 +75,18 @@ def comment_read(comment_id):
     return jsonify(comment.to_dict())
 
 
-@api.route('/comment/<int:comment_id>',methods=("DELETE",))
+@api.route('/comment/<int:comment_id>', methods=("DELETE",))
 def comment_delete(comment_id):
     comment = Comment.query.get(comment_id)
     session.delete(comment)
     session.commit()
     return jsonify(comment.to_dict())
 
+
 # Comment CRUD ###########################################
 
 # Action CRUD ###########################################
-@api.route('/action',methods=("POST",))
+@api.route('/action', methods=("POST",))
 def action_create():
     # action type
     # 1 - like
@@ -95,31 +97,35 @@ def action_create():
     session.commit()
     return jsonify(action.to_dict())
 
-@api.route('/action',methods=('GET',))
+
+@api.route('/action', methods=('GET',))
 def action_index():
     actions = Action.query.all()
-    json_actions =[]
+    json_actions = []
     for action in actions:
         json_actions.append(action.to_dict())
     return jsonify(json_actions)
 
-@api.route('/action/<int:action_id>',methods=("GET",))
+
+@api.route('/action/<int:action_id>', methods=("GET",))
 def action_read(action_id):
     action = Action.query.get(action_id)
     return jsonify(action.to_dict())
 
-@api.route('/action/<int:action_id>',methods=("DELETE",))
+
+@api.route('/action/<int:action_id>', methods=("DELETE",))
 def action_delete(action_id):
     action = Action.query.get(action_id)
     session.delete(action)
     session.commit()
     return jsonify(action.to_dict())
 
+
 # Action CRUD ###########################################
 
 
 # Category CRUD ###########################################
-@api.route('/category',methods=("POST",))
+@api.route('/category', methods=("POST",))
 def category_create():
     req_category = request.get_json()
     category = Category(**req_category)
@@ -127,7 +133,8 @@ def category_create():
     commit()
     return jsonify(category.to_dict())
 
-@api.route('/category',methods=("GET",))
+
+@api.route('/category', methods=("GET",))
 def category_index():
     categories = Category.query.all()
     json_categories = []
@@ -136,14 +143,42 @@ def category_index():
 
     return jsonify(json_categories)
 
-@api.route('/category/<int:category_id>',methods=("GET",))
+
+@api.route('/category/<int:category_id>', methods=("GET",))
 def category_read(category_id):
     category = Category.query.get(category_id)
     return jsonify(category.to_dict())
 
-@api.route('/category/<int:category_id>',methods=("DELETE",))
+
+@api.route('/category/<int:category_id>', methods=("DELETE",))
 def category_delete(category_id):
     category = Category.query.get(category_id)
     delete(category)
     commit()
     return jsonify(category.to_dict())
+
+
+# Category CRUD ###########################################
+
+# User CRUD ###########################################
+@api.route('/profile_picture', methods=("POST",))
+def profile_picture_create():
+    user = request.form.get('user_id')
+    if 'image' in request.files:
+        filename = photos.save(request.files['image'], 'profile_pictures')
+        path = f'storage/{filename}'
+        profile_picture = ProfilePicture(user_id = user, path=path)
+        add(profile_picture)
+        commit()
+        return jsonify(profile_picture.to_dict())
+
+
+@api.route('/profile_picture/<int:profile_picture_id>', methods=("GET",))
+def profile_picture_read(profile_picture_id):
+    profile_picture = ProfilePicture.query.get(profile_picture_id)
+    if profile_picture is None:
+        abort(404)
+    # url = photos.url(profile_picture.path)
+    url = send_from_directory(current_app.config['UPLOADED_PHOTOS_DEST'], profile_picture.path)
+    return jsonify(url)
+    

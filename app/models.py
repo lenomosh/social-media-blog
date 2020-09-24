@@ -8,10 +8,9 @@ from app.db import (
     ForeignKey,
     Model,
     Relationship)
-# import sys
-# sys.setrecursionlimit(10**5)
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
+from flask_login import UserMixin
 
 
 class Common(SerializerMixin):
@@ -76,7 +75,7 @@ class Pitch(Model, Common):
     serialize_only = ( 'id','user_id','content','category_id',)
 
 
-class User(Model, Common):
+class User(Model, Common, UserMixin):
     __tablename__ = 'users'
     id = Column(
         BigInteger,
@@ -88,11 +87,13 @@ class User(Model, Common):
     )
     username = Column(
         String(50),
-        nullable=False
+        nullable=False,
+        unique=True
     )
     email = Column(
         String(100),
-        nullable=False
+        nullable=False,
+        unique=True
     )
     password = Column(
         String,

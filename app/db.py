@@ -13,3 +13,4 @@ session = db.session
 add = session.add
 delete = session.delete
 commit = session.commit
+or_ = db.or_
