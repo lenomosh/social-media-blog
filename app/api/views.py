@@ -160,25 +160,31 @@ def category_delete(category_id):
 
 # Category CRUD ###########################################
 
-# User CRUD ###########################################
+# PICTURE CRUD ###########################################
+
+@api.route('/profile_picture/<int:profile_picture_id>', methods=("GET",))
+def profile_picture_read(profile_picture_id):
+    # return "sdfdsfhdsuifhius"
+    profile_picture = ProfilePicture.query.get(profile_picture_id)
+
+    if profile_picture is None:
+        abort(404,"Pic not found")
+    else:
+        import pdb;pdb.set_trace()
+        return send_from_directory('storage', profile_picture.path)
+        return jsonify(url.__dict__)
+
+
 @api.route('/profile_picture', methods=("POST",))
 def profile_picture_create():
     user = request.form.get('user_id')
     if 'image' in request.files:
-        filename = photos.save(request.files['image'], 'profile_pictures')
-        path = f'storage/{filename}'
+        filename = photos.save(request.files['image'])
+        path = f'{filename}'
         profile_picture = ProfilePicture(user_id = user, path=path)
         add(profile_picture)
         commit()
         return jsonify(profile_picture.to_dict())
 
 
-@api.route('/profile_picture/<int:profile_picture_id>', methods=("GET",))
-def profile_picture_read(profile_picture_id):
-    profile_picture = ProfilePicture.query.get(profile_picture_id)
-    if profile_picture is None:
-        abort(404)
-    # url = photos.url(profile_picture.path)
-    url = send_from_directory(current_app.config['UPLOADED_PHOTOS_DEST'], profile_picture.path)
-    return jsonify(url)
-    
+

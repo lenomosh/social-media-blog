@@ -14,6 +14,10 @@ from flask_login import UserMixin
 
 
 class Common(SerializerMixin):
+    id = Column(
+        BigInteger,
+        primary_key=True
+    )
     CREATED_AT = Column(
         TIMESTAMP,
         default=datetime.utcnow()
@@ -26,10 +30,6 @@ class Common(SerializerMixin):
 
 class Category(Common, Model):
     __tablename__ = 'categories'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     name = Column(
         String(50),
         nullable=False
@@ -38,10 +38,6 @@ class Category(Common, Model):
 
 class Pitch(Model, Common):
     __tablename__ = 'pitches'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     content = Column(
         String(1000),
         nullable=False
@@ -77,10 +73,6 @@ class Pitch(Model, Common):
 
 class User(Model, Common, UserMixin):
     __tablename__ = 'users'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     name = Column(
         String(50),
         nullable=False
@@ -103,10 +95,6 @@ class User(Model, Common, UserMixin):
 
 class Comment(Model, Common):
     __tablename__ = 'comments'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     content = Column(
         Text,
         nullable=False
@@ -125,10 +113,6 @@ class Comment(Model, Common):
 
 class Action(Common, Model):
     __tablename__ = 'actions'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     user_id = Column(
         BigInteger,
         ForeignKey('users.id'),
@@ -147,10 +131,6 @@ class Action(Common, Model):
 
 class ProfilePicture(Common, Model):
     __tablename__ = 'profile_pictures'
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
     path = Column(
         String(256),
         nullable=False

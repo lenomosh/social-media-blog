@@ -16,19 +16,14 @@ def create_app(config_name='dev'):
     # CORS(app)
     app.config.from_object(config_options[config_name])
     lm = LM()
-    lm.login_view = 'auth.login'
-    db.init_app(app)
+    lm.login_view = 'auth.user_login'
     lm.init_app(app)
+    db.init_app(app)
+
     from app.api import api
     app.register_blueprint(api, url_prefix='/api')
     configure_uploads(app, photos)
     print('*' * 50)
     from app.auth import auth
     app.register_blueprint(auth,url_prefix='/api/auth/v1.0')
-
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-
     return app
