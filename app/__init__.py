@@ -4,6 +4,7 @@ from flask import Flask
 from app.db import db
 from flask_cors import CORS
 from flask_uploads import UploadSet, configure_uploads, IMAGES
+from flask_login import LoginManager as LM
 
 photos = UploadSet('photos', IMAGES)
 
@@ -14,7 +15,10 @@ def create_app(config_name='dev'):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     # CORS(app)
     app.config.from_object(config_options[config_name])
+    lm = LM()
+    lm.login_view = 'auth.login'
     db.init_app(app)
+    lm.init_app(app)
     from app.api import api
     app.register_blueprint(api, url_prefix='/api')
     configure_uploads(app, photos)
