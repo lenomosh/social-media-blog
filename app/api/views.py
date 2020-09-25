@@ -170,7 +170,7 @@ def profile_picture_read(profile_picture_id):
     if profile_picture is None:
         abort(404,"Pic not found")
     else:
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         return send_from_directory('storage', profile_picture.path)
         return jsonify(url.__dict__)
 

@@ -3,6 +3,7 @@
 *.p
 /.idea
 yc
+/app/storage
 __pycache__/
 instance/
 .pytest_cache/

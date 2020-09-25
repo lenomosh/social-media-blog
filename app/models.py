@@ -13,6 +13,9 @@ from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
 
 
+
+
+
 class Common(SerializerMixin):
     id = Column(
         BigInteger,
