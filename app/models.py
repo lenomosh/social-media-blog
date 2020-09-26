@@ -11,6 +11,8 @@ from app.db import (
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
+from flask import current_app
 
 
 class Common(SerializerMixin):
@@ -26,8 +28,6 @@ class Common(SerializerMixin):
         TIMESTAMP,
         nullable=True
     )
-
-
 
 
 class Category(Common, Model):
@@ -81,8 +81,10 @@ class Pitch(Model, Common):
         'Comment',
         lazy=True
     )
+
     def likes(self):
         return self.query.filter
+
     serialize_only = (
         'category.name',
         'author.name',
@@ -98,7 +100,6 @@ class Pitch(Model, Common):
         "comments.id"
 
         ,)
-
 
 
 class User(Model, Common, UserMixin):
@@ -126,6 +127,22 @@ class User(Model, Common, UserMixin):
         lazy=True,
         uselist=False
     )
+
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({"id": self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:  # valid token but has expired
+            return None
+        except BadSignature: #token is invalid
+            return None
+        user = User.query.get(data['id'])
+        return user
 
 
 class Comment(Model, Common):

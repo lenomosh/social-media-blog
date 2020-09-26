@@ -28,7 +28,7 @@ def pitch_index():
     for pitch in pitches:
         likes = Action.query.filter_by(action_type=1, pitch_id=pitch.id).count()
         dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch.id).count()
-        pitch = dict(**pitch.to_dict(),likes=likes,dislikes=dislikes)
+        pitch = dict(**pitch.to_dict(), likes=likes, dislikes=dislikes)
         json_pitches.append(pitch)
     return jsonify(json_pitches)
 
@@ -44,9 +44,8 @@ def pitch_delete(pitch_id):
 @api.route('/pitch/<int:pitch_id>', methods=['GET'])
 def pitch_read(pitch_id):
     pitch = Pitch.query.get(pitch_id)
-    likes =  Action.query.filter_by(action_type=1, pitch_id=pitch_id).count()
+    likes = Action.query.filter_by(action_type=1, pitch_id=pitch_id).count()
     dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch_id).count()
-
 
     return jsonify(**pitch.to_dict(), likes=likes, dislikes=dislikes)
 
@@ -98,10 +97,12 @@ def action_create():
     # 1 - like
     # 0 - dislike
     req_action = request.get_json()
-    catch_dup = Action.query.filter_by(user_id=req_action['user_id'],pitch_id=req_action['pitch_id']).first()
-    if catch_dup:
-        return jsonify(
-            description=f"You have already {'liked' if catch_dup['action_type']==1 else 'disliked'} this post"),405
+    catch_dups = Action.query.filter_by(user_id=req_action['user_id'], pitch_id=req_action['pitch_id']).all()
+    # return jsonify([catch_dup.to_dict()['action_type'] == req_action['action_type']])
+    if catch_dups:
+        for catch_dup in catch_dups:
+            if catch_dup.to_dict()['action_type'] == req_action['action_type']:
+                return jsonify(description=f"You have already {'liked' if catch_dup.to_dict()['action_type'] == 1 else 'disliked'} this post"), 405
     action = Action(**req_action)
     add(action)
     commit()
