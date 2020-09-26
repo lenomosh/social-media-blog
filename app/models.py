@@ -81,7 +81,8 @@ class Pitch(Model, Common):
         'Comment',
         lazy=True
     )
-
+    def likes(self):
+        return self.query.filter
     serialize_only = (
         'category.name',
         'author.name',
@@ -91,8 +92,13 @@ class Pitch(Model, Common):
         "content",
         "comments.author.name",
         "comments.author.profile_picture.id",
-        "comments.content"
+        "comments.author.id",
+        "comments.CREATED_AT",
+        "comments.content",
+        "comments.id"
+
         ,)
+
 
 
 class User(Model, Common, UserMixin):

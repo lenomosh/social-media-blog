@@ -9,7 +9,7 @@ from app.models import Pitch, Comment, Action, Category, User, ProfilePicture
 @api.route('/pitch', methods=['POST'])
 def pitch_create():
     data = request.get_json()
-    user_id= data['user_id']
+    user_id = data['user_id']
     category_id = data['category_id']
     content = data['content']
     pitch = Pitch(user_id=user_id, category_id=category_id, content=content)
@@ -26,7 +26,10 @@ def pitch_index():
     # import pdb;pdb.set_trace()
     json_pitches = []
     for pitch in pitches:
-        json_pitches.append(pitch.to_dict())
+        likes = Action.query.filter_by(action_type=1, pitch_id=pitch.id).count()
+        dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch.id).count()
+        pitch = dict(**pitch.to_dict(),likes=likes,dislikes=dislikes)
+        json_pitches.append(pitch)
     return jsonify(json_pitches)
 
 
@@ -38,10 +41,14 @@ def pitch_delete(pitch_id):
     return jsonify(pitch.to_dict())
 
 
-@api.route('/pitch/<int:id>', methods=['GET'])
+@api.route('/pitch/<int:pitch_id>', methods=['GET'])
 def pitch_read(pitch_id):
     pitch = Pitch.query.get(pitch_id)
-    return pitch.to_dict()
+    likes =  Action.query.filter_by(action_type=1, pitch_id=pitch_id).count()
+    dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch_id).count()
+
+
+    return jsonify(**pitch.to_dict(), likes=likes, dislikes=dislikes)
 
 
 # Pitch CRUD ###########################################
@@ -170,7 +177,9 @@ def profile_picture_read(profile_picture_id):
         abort(404, "Pic not found")
     else:
         # import pdb;pdb.set_trace()
-        return send_from_directory('storage', profile_picture.path)
+        # return profile_picture.path
+        # return photos.url(profile_picture.path)
+        return send_from_directory('storage/profile_pictures', profile_picture.path)
         return jsonify(url.__dict__)
 
 
@@ -179,8 +188,7 @@ def profile_picture_create():
     user = request.form.get('user_id')
     if 'image' in request.files:
         filename = photos.save(request.files['image'])
-        path = f'{filename}'
-        profile_picture = ProfilePicture(user_id=user, path=path)
+        profile_picture = ProfilePicture(user_id=user, path=filename)
         add(profile_picture)
         commit()
         return jsonify(profile_picture.to_dict())
