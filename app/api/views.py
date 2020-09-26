@@ -96,12 +96,16 @@ def comment_delete(comment_id):
 def action_create():
     # action type
     # 1 - like
-    # 2 - dislike
+    # 0 - dislike
     req_action = request.get_json()
+    catch_dup = Action.query.filter_by(user_id=req_action['user_id'],pitch_id=req_action['pitch_id']).first()
+    if catch_dup:
+        return jsonify(
+            description=f"You have already {'liked' if catch_dup['action_type']==1 else 'disliked'} this post"),405
     action = Action(**req_action)
     add(action)
     commit()
-    return jsonify(action.to_dict())
+    return jsonify("Success"), 200
 
 
 @api.route('/action', methods=('GET',))
