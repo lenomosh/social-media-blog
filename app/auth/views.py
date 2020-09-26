@@ -4,7 +4,6 @@ from app.models import User
 from app.db import add, commit, or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, current_user, logout_user, login_required
-# from app import lm as login_manager
 from app import lm as login_manager
 
 
@@ -18,13 +17,15 @@ def user_create():
     user_req = request.get_json()
     user = User.query.filter_by(email=user_req['email']).first()
     if user:
+        # return jsonify(user.to_dict(only=("name", "email", "username",))), 200
         return jsonify(description="User with the email  already exist"), 409
+
     user = User.query.filter_by(username=user_req['username']).first()
     if user:
         return jsonify(description="User with the username already exist"), 409
     user = User(
         email=user_req['email'],
-        username=user_req['password'],
+        username=user_req['username'],
         name=user_req['name'],
         password=generate_password_hash(
             user_req['password'],
@@ -33,8 +34,7 @@ def user_create():
     add(user)
     commit()
     login_user(user)
-
-    return jsonify(user.to_dict()), 200
+    return jsonify(user.to_dict(only=("name","email","username",))), 200
 
 
 @auth.route('/login', methods=("POST",))
@@ -42,20 +42,20 @@ def user_login():
     user_req = request.get_json()
     user = User.query.filter(
         or_(
-            User.email == user_req['email'],
-            User.username == user_req['email']
+            User.email == user_req['username'],
+            User.username == user_req['username']
 
         )).first()
     if not user:
-        abort(404, 'User with the email/username provided does not exist')
+        return jsonify(description='User with the email/username provided does not exist'), 404
     if not (check_password_hash(user.password, user_req['password'])):
-        abort(401, "The password you provided was incorrect!")
+        return jsonify(description="The password you provided was incorrect!"), 401
     login_user(user, remember=True if user_req['remember'] else False)
-    return jsonify(current_user.to_dict())
+    return jsonify(current_user.to_dict(only=("name", "email", "username"))), 200
 
 
 @auth.route('/logout', methods=("GET",))
 @login_required
 def user_logout():
     logout_user()
-    return jsonify("Success")
+    return jsonify(description="Success"),200

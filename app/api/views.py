@@ -26,8 +26,8 @@ def pitch_index():
     # import pdb;pdb.set_trace()
     json_pitches = []
     for pitch in pitches:
-        json_pitches.append(pitch)
-    return json_pitches
+        json_pitches.append(pitch.to_dict())
+    return jsonify(json_pitches)
 
 
 @api.route('/pitch/<int:id>', methods=['DELETE'])

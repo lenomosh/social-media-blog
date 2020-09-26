@@ -28,12 +28,21 @@ class Common(SerializerMixin):
     )
 
 
+
+
 class Category(Common, Model):
     __tablename__ = 'categories'
     name = Column(
         String(50),
         nullable=False
     )
+    serialize_only = (
+        'pitches.content',
+        'pitches.author.name',
+        "pitches.author.profile_picture.id",
+        "id",
+        "name"
+        ,)
 
 
 class Pitch(Model, Common):
@@ -68,7 +77,22 @@ class Pitch(Model, Common):
         'Action',
         lazy=True,
     )
-    # serialize_only = ('id', 'user_id', 'content', 'category_id',)
+    comments = Relationship(
+        'Comment',
+        lazy=True
+    )
+
+    serialize_only = (
+        'category.name',
+        'author.name',
+        'author.profile_picture.id',
+        'author.id',
+        "id",
+        "content",
+        "comments.author.name",
+        "comments.author.profile_picture.id",
+        "comments.content"
+        ,)
 
 
 class User(Model, Common, UserMixin):
@@ -91,6 +115,11 @@ class User(Model, Common, UserMixin):
         String,
         nullable=False
     )
+    profile_picture = Relationship(
+        "ProfilePicture",
+        lazy=True,
+        uselist=False
+    )
 
 
 class Comment(Model, Common):
@@ -109,6 +138,18 @@ class Comment(Model, Common):
         ForeignKey('users.id'),
         nullable=False
     )
+    author = Relationship(
+        "User",
+        backref="comments",
+        lazy=True
+    )
+    serialize_only = (
+        "id",
+        "CREATED_AT",
+        "content",
+        "author.name",
+        "author.profile_picture.id"
+        ,)
 
 
 class Action(Common, Model):
