@@ -1,6 +1,6 @@
 from app import photos
 from app.api import api
-from flask import request, jsonify, abort, send_from_directory,current_app
+from flask import request, jsonify, abort, send_from_directory, current_app
 from app.db import session, add, commit, delete
 from app.models import Pitch, Comment, Action, Category, User, ProfilePicture
 
@@ -8,34 +8,33 @@ from app.models import Pitch, Comment, Action, Category, User, ProfilePicture
 # Pitch CRUD ###########################################
 @api.route('/pitch', methods=['POST'])
 def pitch_create():
-    user_id = request.form.get('user_id')
-    category_id = request.form.get('category_id')
-    content = request.form.get('content')
+    data = request.get_json()
+    user_id= data['user_id']
+    category_id = data['category_id']
+    content = data['content']
     pitch = Pitch(user_id=user_id, category_id=category_id, content=content)
-    # try:
-    session.add(pitch)
-    session.commit()
+    # import pdb;pdb.set_trace()
+    add(pitch)
+    commit()
     pitch = Pitch.query.get(pitch.id).to_dict()
-
     return jsonify(pitch)
-    # except:
-    #     abort(503)
 
 
 @api.route('/pitch', methods=['GET'])
 def pitch_index():
     pitches = Pitch.query.all()
+    # import pdb;pdb.set_trace()
     json_pitches = []
     for pitch in pitches:
-        json_pitches.append(pitch.to_dict())
-    return jsonify(json_pitches)
+        json_pitches.append(pitch)
+    return json_pitches
 
 
 @api.route('/pitch/<int:id>', methods=['DELETE'])
 def pitch_delete(pitch_id):
     pitch = Pitch.query.get(pitch_id)
-    session.delete(pitch)
-    session.commit()
+    delete(pitch)
+    commit()
     return jsonify(pitch.to_dict())
 
 
@@ -54,8 +53,8 @@ def pitch_read(pitch_id):
 def comment_create():
     req_data = request.get_json()
     comment = Comment(**req_data)
-    session.add(comment)
-    session.commit()
+    add(comment)
+    commit()
     return comment.to_dict()
 
 
@@ -78,8 +77,8 @@ def comment_read(comment_id):
 @api.route('/comment/<int:comment_id>', methods=("DELETE",))
 def comment_delete(comment_id):
     comment = Comment.query.get(comment_id)
-    session.delete(comment)
-    session.commit()
+    delete(comment)
+    commit()
     return jsonify(comment.to_dict())
 
 
@@ -93,8 +92,8 @@ def action_create():
     # 2 - dislike
     req_action = request.get_json()
     action = Action(**req_action)
-    session.add(action)
-    session.commit()
+    add(action)
+    commit()
     return jsonify(action.to_dict())
 
 
@@ -116,8 +115,8 @@ def action_read(action_id):
 @api.route('/action/<int:action_id>', methods=("DELETE",))
 def action_delete(action_id):
     action = Action.query.get(action_id)
-    session.delete(action)
-    session.commit()
+    delete(action)
+    commit()
     return jsonify(action.to_dict())
 
 
@@ -168,7 +167,7 @@ def profile_picture_read(profile_picture_id):
     profile_picture = ProfilePicture.query.get(profile_picture_id)
 
     if profile_picture is None:
-        abort(404,"Pic not found")
+        abort(404, "Pic not found")
     else:
         # import pdb;pdb.set_trace()
         return send_from_directory('storage', profile_picture.path)
@@ -181,10 +180,7 @@ def profile_picture_create():
     if 'image' in request.files:
         filename = photos.save(request.files['image'])
         path = f'{filename}'
-        profile_picture = ProfilePicture(user_id = user, path=path)
+        profile_picture = ProfilePicture(user_id=user, path=path)
         add(profile_picture)
         commit()
         return jsonify(profile_picture.to_dict())
-
-
-

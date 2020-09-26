@@ -7,6 +7,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 # from app import lm as login_manager
 from app import lm as login_manager
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -17,7 +18,10 @@ def user_create():
     user_req = request.get_json()
     user = User.query.filter_by(email=user_req['email']).first()
     if user:
-        return abort(409, "User with the email or username already exist")
+        return jsonify(description="User with the email  already exist"), 409
+    user = User.query.filter_by(username=user_req['username']).first()
+    if user:
+        return jsonify(description="User with the username already exist"), 409
     user = User(
         email=user_req['email'],
         username=user_req['password'],
@@ -30,7 +34,7 @@ def user_create():
     commit()
     login_user(user)
 
-    return jsonify(user.to_dict())
+    return jsonify(user.to_dict()), 200
 
 
 @auth.route('/login', methods=("POST",))

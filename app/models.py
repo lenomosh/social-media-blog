@@ -13,9 +13,6 @@ from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
 
 
-
-
-
 class Common(SerializerMixin):
     id = Column(
         BigInteger,
@@ -63,7 +60,7 @@ class Pitch(Model, Common):
     )
     category = Relationship(
         'Category',
-        backref='category_pitches',
+        backref='pitches',
         lazy=True,
         uselist=False
     )
@@ -71,7 +68,7 @@ class Pitch(Model, Common):
         'Action',
         lazy=True,
     )
-    serialize_only = ( 'id','user_id','content','category_id',)
+    # serialize_only = ('id', 'user_id', 'content', 'category_id',)
 
 
 class User(Model, Common, UserMixin):
