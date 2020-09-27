@@ -19,7 +19,6 @@ def create_app(config_name='dev'):
     from app.api import api
     app.register_blueprint(api, url_prefix='/api')
     configure_uploads(app, photos)
-    print('*' * 50)
     from app.auth import auth
     app.register_blueprint(auth, url_prefix='/api/auth/v1.0')
     return app
