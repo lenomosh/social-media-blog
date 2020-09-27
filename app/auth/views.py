@@ -1,15 +1,19 @@
 from app.auth import auth
-from flask import request, jsonify, abort
+from flask import request, jsonify, g, url_for
 from app.models import User
 from app.db import add, commit, or_
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import login_user, current_user, logout_user, login_required
-from app import lm as login_manager
+from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_refresh_token_required, get_raw_jwt
+from app import jwt
+
+blacklist = set()
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+@auth.route('/user/<int:user_id>')
+def user_read(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify(description="User not found"), 404
+    return jsonify(user.to_dict())
 
 
 @auth.route('/register', methods=("POST",))
@@ -27,35 +31,61 @@ def user_create():
         email=user_req['email'],
         username=user_req['username'],
         name=user_req['name'],
-        password=generate_password_hash(
-            user_req['password'],
-            method='sha256'
-        ))
+        password=user_req['password']
+    )
+    user.hash_password(user_req['password'])
     add(user)
     commit()
-    login_user(user)
-    return jsonify(user.to_dict(only=("name","email","username",))), 200
+    return jsonify({'token': user.generate_auth_token()}), 201, {
+        'Location': url_for('auth.user_read', user_id=user.id, _external=True)}
 
 
 @auth.route('/login', methods=("POST",))
 def user_login():
-    user_req = request.get_json()
-    user = User.query.filter(
-        or_(
-            User.email == user_req['username'],
-            User.username == user_req['username']
+    body = request.get_json()
+    username = body.get('username')
 
-        )).first()
+    try:
+        password = body.get('password')
+    except KeyError:
+        password = None
+    user = User.verify_auth_token(username)
     if not user:
-        return jsonify(description='User with the email/username provided does not exist'), 404
-    if not (check_password_hash(user.password, user_req['password'])):
-        return jsonify(description="The password you provided was incorrect!"), 401
-    login_user(user, remember=True if user_req['remember'] else False)
-    return jsonify(current_user.to_dict(only=("name", "email", "username"))), 200
+        # This means that the auth token is wrong, now we;re trying to auth with username/password
+
+        user = User.query.filter(
+            or_(
+                User.email == username,
+                User.username == username
+
+            )).first()
+        if not user:
+            return jsonify(description='User with the email/username provided does not exist'), 404
+        if not (user.verify_password(password)):
+            return jsonify(description="The password you provided was incorrect!"), 401
+        access_token = user.generate_auth_token(60)
+        refresh_token = user.generate_refresh_token(60)
+    return jsonify(user=user.to_dict(only=("name", "email", "username","id","profile_picture.id")), access_token=access_token,
+                   refresh_token=refresh_token), 200
 
 
 @auth.route('/logout', methods=("GET",))
-@login_required
+@jwt_required
 def user_logout():
-    logout_user()
-    return jsonify(description="Success"),200
+    jti = get_raw_jwt()['jti']
+    blacklist.add(jti)
+    return jsonify({"response": "Successfully logged out"}), 200
+
+
+@auth.route('/refresh_token')
+@jwt_refresh_token_required
+def get_refresh_token():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    return jsonify(refresh_token=user.generate_refresh_token())
+
+
+@jwt.token_in_blacklist_loader
+def is_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return jti in blacklist

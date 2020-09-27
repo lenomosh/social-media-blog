@@ -1,3 +1,5 @@
+import datetime
+
 from app.db import (
     String,
     Column,
@@ -13,7 +15,9 @@ from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 from flask import current_app
-
+from werkzeug.security import generate_password_hash,check_password_hash
+from flask_jwt_extended import create_access_token,decode_token,create_refresh_token
+from datetime import timedelta
 
 class Common(SerializerMixin):
     id = Column(
@@ -36,13 +40,14 @@ class Category(Common, Model):
         String(50),
         nullable=False
     )
-    serialize_only = (
-        'pitches.content',
-        'pitches.author.name',
-        "pitches.author.profile_picture.id",
-        "id",
-        "name"
-        ,)
+    # serialize_only = (
+    #     'pitches.content',
+    #     'pitches.author.name',
+    #     "pitches.author.profile_picture.id",
+    #     "id",
+    #     "name",
+    #     "pitches.comments"
+    #     ,)
 
 
 class Pitch(Model, Common):
@@ -127,22 +132,26 @@ class User(Model, Common, UserMixin):
         lazy=True,
         uselist=False
     )
+    def generate_refresh_token(self,expiration=30):
+        return create_refresh_token(identity=self.id,expires_delta=timedelta(minutes=expiration))
+    def hash_password(self, password):
+        self.password = generate_password_hash(password)
 
-    def generate_auth_token(self, expiration=600):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
-        return s.dumps({"id": self.id})
+    def verify_password(self, password):
+        return check_password_hash(self.password,password)
+
+    def generate_auth_token(self, expiration=30):
+        return create_access_token(
+            identity=self.id,
+            expires_delta=timedelta(minutes=expiration))
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
-        except SignatureExpired:  # valid token but has expired
-            return None
-        except BadSignature: #token is invalid
-            return None
-        user = User.query.get(data['id'])
-        return user
+            data = decode_token(token)
+        except:
+            return
+        return User.query.get(data['id'])
 
 
 class Comment(Model, Common):

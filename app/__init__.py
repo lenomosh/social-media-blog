@@ -3,19 +3,16 @@ from flask import Flask
 from app.db import db
 from flask_cors import CORS
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-from flask_login import LoginManager as LM
-
+from flask_jwt_extended import JWTManager
 photos = UploadSet('photos', IMAGES)
-lm = LM()
-
+jwt = JWTManager()
 
 def create_app(config_name='dev'):
     app = Flask(__name__, instance_relative_config=True)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     app.config.from_object(config_options[config_name])
-    lm.login_view = 'auth.user_login'
-    lm.init_app(app)
     db.init_app(app)
+    jwt.init_app(app)
     from app.api import api
     app.register_blueprint(api, url_prefix='/api')
     configure_uploads(app, photos)
