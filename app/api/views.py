@@ -212,7 +212,6 @@ def profile_picture_read(profile_picture_id):
         # return profile_picture.path
         # return photos.url(profile_picture.path)
         return send_from_directory('storage/profile_pictures', profile_picture.path)
-        return jsonify(url.__dict__)
 
 
 @api.route('/profile_picture', methods=("POST",))
