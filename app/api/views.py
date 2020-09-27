@@ -40,6 +40,7 @@ def pitch_index():
 @jwt_required
 def pitch_delete(pitch_id):
     pitch = Pitch.query.get(pitch_id)
+
     delete(pitch)
     commit()
     return jsonify(pitch.to_dict())
@@ -175,7 +176,15 @@ def category_index():
 @jwt_required
 def category_read(category_id):
     category = Category.query.get(category_id)
-    return jsonify(category.to_dict())
+    pitches =[]
+    for pitch in category.pitches:
+        likes = Action.query.filter_by(action_type=1, pitch_id=pitch.id).count()
+        dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch.id).count()
+        pitch = dict(**pitch.to_dict(), likes=likes, dislikes=dislikes)
+        pitches.append(pitch)
+    # category['pitches'] = pitches
+    category_json =dict(name=category.name,CREATED_AT=category.CREATED_AT,id=category.id,pitches=pitches)
+    return jsonify(category_json)
 
 
 @api.route('/category/<int:category_id>', methods=("DELETE",))
@@ -192,7 +201,6 @@ def category_delete(category_id):
 # PICTURE CRUD ###########################################
 
 @api.route('/profile_picture/<int:profile_picture_id>', methods=("GET",))
-@jwt_required
 def profile_picture_read(profile_picture_id):
     # return "sdfdsfhdsuifhius"
     profile_picture = ProfilePicture.query.get(profile_picture_id)
@@ -210,10 +218,10 @@ def profile_picture_read(profile_picture_id):
 @api.route('/profile_picture', methods=("POST",))
 @jwt_required
 def profile_picture_create():
-    user = request.form.get('user_id')
+    user_id = get_jwt_identity()
     if 'image' in request.files:
         filename = photos.save(request.files['image'])
-        profile_picture = ProfilePicture(user_id=user, path=filename)
+        profile_picture = ProfilePicture(user_id=user_id, path=filename)
         add(profile_picture)
         commit()
         return jsonify(profile_picture.to_dict())
