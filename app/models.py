@@ -69,26 +69,26 @@ class Pitch(Model, Common):
     author = Relationship(
         'User',
         backref='pitches',
-        lazy=True,
+        lazy='subquery',
         uselist=False
     )
     category = Relationship(
         'Category',
         backref='pitches',
-        lazy=True,
+        lazy='subquery',
         uselist=False
     )
     actions = Relationship(
         'Action',
-        lazy=True,
+        lazy='subquery',
     )
     comments = Relationship(
         'Comment',
-        lazy=True
+        lazy='subquery'
     )
-
-    def likes(self):
-        return self.query.filter
+    #
+    # def likes(self):
+    #     return self.query.filter
 
     serialize_only = (
         'category.name',
@@ -129,7 +129,7 @@ class User(Model, Common, UserMixin):
     )
     profile_picture = Relationship(
         "ProfilePicture",
-        lazy=True,
+        lazy='subquery',
         uselist=False
     )
     def generate_refresh_token(self,expiration=30):
@@ -173,7 +173,7 @@ class Comment(Model, Common):
     author = Relationship(
         "User",
         backref="comments",
-        lazy=True
+        lazy='subquery'
     )
     serialize_only = (
         "id",

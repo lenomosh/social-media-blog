@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
 Column = db.Column
 Integer = db.Integer
@@ -14,3 +15,4 @@ add = session.add
 delete = session.delete
 commit = session.commit
 or_ = db.or_
+joinedload_all = db.joinedload_all

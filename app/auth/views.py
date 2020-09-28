@@ -1,9 +1,11 @@
 from app.auth import auth
-from flask import request, jsonify, g, url_for
+from flask import request, jsonify, current_app, url_for
 from app.models import User
 from app.db import add, commit, or_
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_refresh_token_required, get_raw_jwt
 from app import jwt
+from app.mailer import send_email
+
 
 blacklist = set()
 
@@ -13,6 +15,7 @@ def user_read(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify(description="User not found"), 404
+
     return jsonify(user.to_dict())
 
 
@@ -33,11 +36,20 @@ def user_create():
         name=user_req['name'],
         password=user_req['password']
     )
+    # user.options(joinedload_all('*'))
     user.hash_password(user_req['password'])
     add(user)
     commit()
-    return jsonify({'token': user.generate_auth_token()}), 201, {
-        'Location': url_for('auth.user_read', user_id=user.id, _external=True)}
+    user_dup = user.to_dict()
+    token =  user.generate_auth_token()
+    send_email(
+        "[ONE MINUTE PITCH] Welcome",
+        'lenomosh@gmail.com',
+        user_dup['email'],
+        user_dup['name']
+    )
+    return jsonify({'token':token}), 201, {
+        'Location': url_for('auth.user_read', user_id=user_dup['id'], _external=True)}
 
 
 @auth.route('/login', methods=("POST",))

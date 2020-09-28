@@ -244,4 +244,12 @@ def load_user(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify(description="User not found"), 404
-    return jsonify(user.to_dict(only=("name", "id", "pitches", "CREATED_AT", "profile_picture.id","username",)))
+    json_pitches = []
+    for pitch in user.pitches:
+        likes = Action.query.filter_by(action_type=1, pitch_id=pitch.id).count()
+        dislikes = Action.query.filter_by(action_type=0, pitch_id=pitch.id).count()
+        pitch = dict(**pitch.to_dict(), likes=likes, dislikes=dislikes)
+        json_pitches.append(pitch)
+    user_clone = user.to_dict(only=("name", "id", "CREATED_AT", "profile_picture.id","username",))
+    user_clone['pitches'] = json_pitches
+    return jsonify(user_clone)
