@@ -1,11 +1,8 @@
-import datetime
-
 from app.db import (
     String,
     Column,
     TIMESTAMP,
     BigInteger,
-    Integer,
     Text,
     ForeignKey,
     Model,
@@ -13,11 +10,10 @@ from app.db import (
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
-from flask import current_app
-from werkzeug.security import generate_password_hash,check_password_hash
-from flask_jwt_extended import create_access_token,decode_token,create_refresh_token
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, decode_token, create_refresh_token
 from datetime import timedelta
+
 
 class Common(SerializerMixin):
     id = Column(
@@ -41,19 +37,19 @@ class Category(Common, Model):
         nullable=False
     )
     # serialize_only = (
-    #     'pitches.content',
-    #     'pitches.author.name',
-    #     "pitches.author.profile_picture.id",
+    #     'blogs.content',
+    #     'blogs.author.name',
+    #     "blogs.author.profile_picture.id",
     #     "id",
     #     "name",
-    #     "pitches.comments"
+    #     "blogs.comments"
     #     ,)
 
 
-class Pitch(Model, Common):
-    __tablename__ = 'pitches'
+class Blog(Model, Common):
+    __tablename__ = 'blogs'
     content = Column(
-        String(1000),
+        Text,
         nullable=False
     )
     user_id = Column(
@@ -68,19 +64,15 @@ class Pitch(Model, Common):
     )
     author = Relationship(
         'User',
-        backref='pitches',
+        backref='blogs',
         lazy='subquery',
         uselist=False
     )
     category = Relationship(
         'Category',
-        backref='pitches',
+        backref='blogs',
         lazy='subquery',
         uselist=False
-    )
-    actions = Relationship(
-        'Action',
-        lazy='subquery',
     )
     comments = Relationship(
         'Comment',
@@ -132,13 +124,15 @@ class User(Model, Common, UserMixin):
         lazy='subquery',
         uselist=False
     )
-    def generate_refresh_token(self,expiration=30):
-        return create_refresh_token(identity=self.id,expires_delta=timedelta(minutes=expiration))
+
+    def generate_refresh_token(self, expiration=30):
+        return create_refresh_token(identity=self.id, expires_delta=timedelta(minutes=expiration))
+
     def hash_password(self, password):
         self.password = generate_password_hash(password)
 
     def verify_password(self, password):
-        return check_password_hash(self.password,password)
+        return check_password_hash(self.password, password)
 
     def generate_auth_token(self, expiration=30):
         return create_access_token(
@@ -162,7 +156,7 @@ class Comment(Model, Common):
     )
     pitch_id = Column(
         BigInteger,
-        ForeignKey('pitches.id'),
+        ForeignKey('blogs.id'),
         nullable=False
     )
     user_id = Column(
@@ -184,24 +178,6 @@ class Comment(Model, Common):
         ,)
 
 
-class Action(Common, Model):
-    __tablename__ = 'actions'
-    user_id = Column(
-        BigInteger,
-        ForeignKey('users.id'),
-        nullable=False
-    )
-    pitch_id = Column(
-        BigInteger,
-        ForeignKey('pitches.id'),
-        nullable=False
-    )
-    action_type = Column(
-        Integer,
-        nullable=False
-    )
-
-
 class ProfilePicture(Common, Model):
     __tablename__ = 'profile_pictures'
     path = Column(
@@ -211,5 +187,14 @@ class ProfilePicture(Common, Model):
     user_id = Column(
         BigInteger,
         ForeignKey('users.id'),
+        nullable=False
+    )
+
+
+class NewsLetter(Common):
+    user_id = BigInteger(
+        String,
+        ForeignKey('users.id'),
+        unique=True,
         nullable=False
     )

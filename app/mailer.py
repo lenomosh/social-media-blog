@@ -15,6 +15,6 @@ def send_async_email(msg):
 
 def send_email(subject, sender, recipient, name):
     msg = Message(subject, sender=sender, recipients=[recipient])
-    msg.body = render_template('email/welcome_user.txt', name=name)
-    msg.html = render_template('email/welcome_user.html', name=name)
+    msg.body = render_template('email/news_letter.txt', name=name)
+    msg.html = render_template('email/news_letter.html', name=name)
     Thread(target=send_async_email, args=(msg,)).start()

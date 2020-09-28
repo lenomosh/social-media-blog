@@ -1,0 +1,5 @@
+Dear, {{ name }}
+Welcome to PFS Social Blog
+This is to notify you that you've subscribed to our newsletter.
+Sincerely,
+PFS Support Team

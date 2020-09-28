@@ -1,5 +1,0 @@
-Dear, {{ name }}
-Welcome to One Minute Pitch
-We hope you'll enjoy your stay with us.
-Sincerely
-OMP Support Team
