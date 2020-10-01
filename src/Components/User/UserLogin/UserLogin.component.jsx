@@ -5,13 +5,12 @@ import Input from "antd/es/input";
 import Checkbox from "antd/es/checkbox";
 import Button from "antd/es/button";
 import Axios from "axios";
-import apiUrls from "../environment";
 import {Divider, message} from "antd/es";
 import {connect} from "react-redux";
-import {setCurrentUser} from "../../redux/user/user.actions";
+import {setCurrentUser} from "../../../redux/user/user.actions";
 import {Redirect} from "react-router-dom";
 import {Spin} from "antd";
-
+import apiUrls from "../../environment";
 const UserLogin =({loginUser})=>{
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);

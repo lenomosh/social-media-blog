@@ -4,7 +4,7 @@ import ReactQuill from "react-quill";
 import {useState} from "react";
 import {Button,Select} from "antd";
 import Axios from "axios";
-import apiUrls, {axiosHeader} from "../environment";
+import apiUrls, {axiosHeader} from "../../environment";
 import {message} from "antd/es";
 import {PlusOutlined} from '@ant-design/icons'
 import Divider from "antd/es/divider";
@@ -12,7 +12,6 @@ import Input from "antd/es/input";
 import {useSelector} from "react-redux";
 import Spin from "antd/es/spin";
 const {Option} = Select
-
 const BlogCreate =()=>{
     const currentuser = useSelector(state=>state.user.currentUser)
     const [blogValue, setblogValue] = useState('');

@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {QuestionCircleOutlined} from '@ant-design/icons'
 import {Form, Input, Tooltip, Checkbox, Button} from "antd";
 import Axios from "axios";
-import apiUrls from "../environment";
+import apiUrls from "../../environment";
 import {message} from "antd/es";
 import {Redirect} from "react-router-dom";
 import Divider from "antd/es/divider";
