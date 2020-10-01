@@ -11,10 +11,12 @@ import Divider from "antd/es/divider";
 import Input from "antd/es/input";
 import {useSelector} from "react-redux";
 import Spin from "antd/es/spin";
+import {Editor} from "../../Helpers/Editor";
 const {Option} = Select
 const BlogCreate =()=>{
     const currentuser = useSelector(state=>state.user.currentUser)
     const [blogValue, setblogValue] = useState('');
+    const [blogTitle, setBlogTitle] = useState('');
     const [categories, setCategories] = useState(null);
     const [blogCategoryID, setblogCategoryID] = useState('');
     const [newCategory, setNewCategory] = useState('');
@@ -47,20 +49,24 @@ const BlogCreate =()=>{
         if (!blogCategoryID){
             return message.warn("Select category to which the blog should belong!",6)
         }
+        if (!blogTitle){
+            return message.warn("Enter a blog title",6)
+
+        }
         if (!blogValue){
             return message.info("You really want to submit a blank blog? Wow",6)
         }
         // console.log(blogValue.length)
         // console.log(blogValue)
-        if (blogValue.length<9){
+        if (blogValue.length<100){
             return message.warn("Seriously, your blog is too short. :XD",5)
         }
         setLoading(true)
         Axios.post(apiUrls.blog.create
         ,{
                 content:blogValue,
-                user_id:currentuser.user.id,
-                category_id:blogCategoryID
+                category_id:blogCategoryID,
+                title:blogTitle
             },
             {
            headers: {
@@ -73,6 +79,7 @@ const BlogCreate =()=>{
                 setblogCategoryID('')
                 setblogValue('')
                 setLoading(false)
+                setBlogTitle('')
                 // console.log(res.data)
         })
             .catch(err=>{
@@ -147,9 +154,11 @@ const BlogCreate =()=>{
                             <Option key={item.id} value={item.id}>{item.name}</Option>
                         ))}
                     </Select>
-                    <p className={'pt-4'}>blog:</p>
-                    <ReactQuill className={'my-4'}  style={{backgroundColor:'white',height:"100px"}} theme={'snow'} value={blogValue} onChange={setblogValue}/>
+                    <p className={'pt-4'}>Title:</p>
+                    <Input type={"text"} value={blogTitle} onChange={({target:{value}})=>setBlogTitle(value)} />
 
+                    <p className={'pt-4'}>Blog:</p>
+                    <Editor value={blogValue} onChange={setblogValue}/>
                 </div>
                 <div className="card-footer">
 

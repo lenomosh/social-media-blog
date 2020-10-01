@@ -16,7 +16,7 @@ function App() {
           <Switch>
               <Route exact path={'/'} render={()=><Homepage/>}/>
               <Route exact path={'/create'} render={()=><BlogCreate/>}/>
-              <Route exact path={'/read'} render={()=><BlogRead/>}/>
+              <Route exact path={'/read/:blogID'} render={()=><BlogRead/>}/>
               <Route exact path={'/login'} render={()=><UserLogin/>}/>
               <Route exact path={'/register'} render={()=><UserCreate/>}/>
 

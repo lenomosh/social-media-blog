@@ -1,9 +1,12 @@
-import React from 'react'
+import React, {useState} from 'react'
 import './BlogRead.styles.scss'
+import {useParams} from 'react-router-dom'
 
 const BlogRead = ()=>{
+  const {blogID} = useParams()
+  const [loading, setLoading] = useState(false);
 
-    return(
+  return(
         <div className={'BlogRead'}>
             
       <div className="section">
