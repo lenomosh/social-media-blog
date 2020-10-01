@@ -20,7 +20,7 @@
 
 
 
-/* 
+/*
 Template Name: WebMag Html Template
 
 Author: yaminncco
@@ -94,7 +94,7 @@ p {
 ul,ol{
   margin: 0;
   padding: 0;
-  list-style: none 
+  list-style: none
 }
 ul.list-style, ol.list-style {
   padding-left: 15px;
@@ -288,6 +288,8 @@ textarea.input {
 \*----------------------------*/
 .nav-menu {
   margin-left: 20px;
+  display: flex;
+  flex-direction: row;
 }
 .nav-menu li a {
   position: relative;

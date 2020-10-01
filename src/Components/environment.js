@@ -1,4 +1,4 @@
-const apiUrl = 'https://flask-bloging-app-api.herokuapp.com/api/'
+const apiUrl = 'http://localhost:5000/api/'
 export const axiosHeader = {
     'Accept' : 'application/json',
     'Content-Type': 'application/json'

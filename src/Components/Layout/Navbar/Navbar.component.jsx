@@ -1,7 +1,11 @@
 import React from "react";
 import "./Navbar.styles.scss";
+import {Link} from "react-router-dom";
+import {connect, useSelector} from "react-redux";
+import {logoutCurrentUser} from "../../../redux/user/user.actions";
 
-const Navbar = () => {
+const Navbar = ({logoutUser}) => {
+  const currentUser = useSelector(state=>state.user.currentUser)
   return (
     <div>
       <header id="header">
@@ -34,128 +38,20 @@ const Navbar = () => {
                 </li>
               </ul>
               <div className="nav-btns">
-                <button className="aside-btn">
-                  <i className="fa fa-bars" />
-                </button>
+                  {currentUser?
+
+                      <button onClick={logoutUser} className="aside-btn">
+                       Logout
+                      </button>
+                      :
+                      <button className="aside-btn">
+
+                      <Link to={'/login'}>Login</Link>
+                      </button>
+                  }
                 <button className="search-btn">
                   <i className="fa fa-search" />
                 </button>
-                <div className="search-form">
-                  <input
-                    className="search-input"
-                    type="text"
-                    name="search"
-                    placeholder="Enter Your Search ..."
-                  />
-                  <button className="search-close">
-                    <i className="fa fa-times" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="nav-aside">
-            <div className="section-row">
-              <ul className="nav-aside-menu">
-                <li>
-                  <a href="index.html">Home</a>
-                </li>
-                <li>
-                  <a href="about.html">About Us</a>
-                </li>
-                <li>
-                  <a href="#">Join Us</a>
-                </li>
-                <li>
-                  <a href="#">Advertisement</a>
-                </li>
-                <li>
-                  <a href="contact.html">Contacts</a>
-                </li>
-              </ul>
-            </div>
-            <div className="section-row">
-              <h3>Recent Posts</h3>
-              <div className="post post-widget">
-                <a className="post-img" href="blog-post.html">
-                  <img src="./img/widget-2.jpg" alt />
-                </a>
-                <div className="post-body">
-                  <h3 className="post-title">
-                    <a href="blog-post.html">
-                      Pagedraw UI Builder Turns Your Website Design Mockup Into
-                      Code Automatically
-                    </a>
-                  </h3>
-                </div>
-              </div>
-              <div className="post post-widget">
-                <a className="post-img" href="blog-post.html">
-                  <img src="./img/widget-3.jpg" alt />
-                </a>
-                <div className="post-body">
-                  <h3 className="post-title">
-                    <a href="blog-post.html">
-                      Why Node.js Is The Coolest Kid On The Backend Development
-                      Block!
-                    </a>
-                  </h3>
-                </div>
-              </div>
-              <div className="post post-widget">
-                <a className="post-img" href="blog-post.html">
-                  <img src="./img/widget-4.jpg" alt />
-                </a>
-                <div className="post-body">
-                  <h3 className="post-title">
-                    <a href="blog-post.html">
-                      Tell-A-Tool: Guide To Web Design And Development Tools
-                    </a>
-                  </h3>
-                </div>
-              </div>
-            </div>
-            <div className="section-row">
-              <h3>Follow us</h3>
-              <ul className="nav-aside-social">
-                <li>
-                  <a href="#">
-                    <i className="fa fa-facebook" />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-twitter" />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-google-plus" />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-pinterest" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <button className="nav-aside-close">
-              <i className="fa fa-times" />
-            </button>
-          </div>
-        </div>
-        <div className="page-header">
-          <div className="container">
-            <div className="row">
-              <div className="col-md-10">
-                <ul className="page-header-breadcrumb">
-                  <li>
-                    <a href="index.html">Home</a>
-                  </li>
-                  <li>Regular page</li>
-                </ul>
-                <h1>Regular page</h1>
               </div>
             </div>
           </div>
@@ -165,4 +61,7 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+const mapDispatchToProps = (dispatch)=>(
+    {logoutUser:()=>dispatch(logoutCurrentUser())}
+)
+export default connect(null,mapDispatchToProps) (Navbar);

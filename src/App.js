@@ -12,6 +12,7 @@ import UserCreate from "./Components/User/UserCreate/UserCreate.component";
 function App() {
   return (
       <div>
+          <Navbar/>
           <Switch>
               <Route exact path={'/'} render={()=><Homepage/>}/>
               <Route exact path={'/create'} render={()=><BlogCreate/>}/>

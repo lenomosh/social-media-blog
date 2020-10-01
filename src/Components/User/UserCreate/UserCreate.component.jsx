@@ -74,14 +74,7 @@ const UserCreate = () => {
                                         <div className="col-sm-6">
                                             <Form.Item
                                                 name="username"
-                                                label={
-                                                    <span>
-            Username&nbsp;
-                                                        <Tooltip
-                                                            title="What do you want others to call you? This will be used to ">
-              <QuestionCircleOutlined/>
-            </Tooltip>
-          </span>
+                                                label={"Username"
                                                 }
                                                 rules={[
                                                     {
@@ -111,6 +104,21 @@ const UserCreate = () => {
                                         ]}
                                     >
                                         <Input/>
+                                    </Form.Item>
+
+
+                                    <Form.Item
+                                        name="about"
+                                        label={"About"                                        }
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: 'Please input your username!',
+                                                whitespace: true,
+                                            },
+                                        ]}
+                                    >
+                                        <Input.TextArea/>
                                     </Form.Item>
 
 
