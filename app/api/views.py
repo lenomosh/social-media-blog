@@ -188,3 +188,6 @@ def load_user(user_id):
         return jsonify(description="User not found"), 404
     user_clone = user.to_dict(only=("name", "blogs", "id", "CREATED_AT", "profile_picture.id","username",))
     return jsonify(user_clone)
+@api.route('/healthy')
+def is_healthy():
+    return jsonify("healthy"),200
