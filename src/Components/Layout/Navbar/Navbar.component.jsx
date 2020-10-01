@@ -11,47 +11,40 @@ const Navbar = ({logoutUser}) => {
       <header id="header">
         <div id="nav">
           <div id="nav-fixed">
-            <div className="container">
+            <div className="container d-flex">
               <div className="nav-logo">
-                <a href="index.html" className="logo">
-                  <img src="./img/logo.png" alt />
+                <a href="index.html" className="logo pt-4">
+                  <h3 className={'text-center'}>Social Blog</h3>
+                  {/*<img src="./img/logo.png" alt />*/}
                 </a>
               </div>
-              <ul className="nav-menu nav navbar-nav">
+              <ul className="nav-menu nav navbar-nav pt-4">
                 <li>
-                  <a href="category.html">News</a>
-                </li>
-                <li>
-                  <a href="category.html">Popular</a>
-                </li>
-                <li className="cat-1">
-                  <a href="category.html">Web Design</a>
-                </li>
-                <li className="cat-2">
-                  <a href="category.html">JavaScript</a>
+                  <Link to={'/'}>Home</Link>
                 </li>
                 <li className="cat-3">
-                  <a href="category.html">Css</a>
-                </li>
-                <li className="cat-4">
-                  <a href="category.html">Jquery</a>
+                  {!currentUser &&
+                  <Link to={'/register'}>Register</Link>}
                 </li>
               </ul>
               <div className="nav-btns">
+
+                <button className="search-btn">
+                  {currentUser &&
+                  <Link to={'/create'}>New Post</Link>}
+                </button>
                   {currentUser?
 
                       <button onClick={logoutUser} className="aside-btn">
                        Logout
                       </button>
+
                       :
                       <button className="aside-btn">
 
                       <Link to={'/login'}>Login</Link>
                       </button>
                   }
-                <button className="search-btn">
-                  <i className="fa fa-search" />
-                </button>
               </div>
             </div>
           </div>

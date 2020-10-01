@@ -25,7 +25,8 @@ const apiUrls = {
         create:apiUrl+'profile_picture'
     },
     comment:{
-        create:apiUrl+'comment'
+        create:apiUrl+'comment',
+        delete:apiUrl+'comment/'
     },
     action:{
         create:apiUrl+'action',
