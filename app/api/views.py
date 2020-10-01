@@ -9,12 +9,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 # Blog CRUD ###########################################
 @api.route('/blog', methods=['POST'])
 @jwt_required
-def pitch_create():
+def blog_create():
     data = request.get_json()
-    user_id = data['user_id']
+    user_id = get_jwt_identity()
     category_id = data['category_id']
     content = data['content']
-    blog = Blog(user_id=user_id, category_id=category_id, content=content)
+    title = data['title']
+    blog = Blog(user_id=user_id, category_id=category_id, title=title, content=content)
     # import pdb;pdb.set_trace()
     add(blog)
     commit()
@@ -23,30 +24,32 @@ def pitch_create():
 
 
 @api.route('/blog', methods=['GET'])
-@jwt_required
-def pitch_index():
+# @jwt_required
+def blog_index():
     blogs = Blog.query.all()
     # import pdb;pdb.set_trace()
-    json_pitches = []
+    json_blogs = []
     for blog in blogs:
-        json_pitches.append(blog.to_dict())
-    return jsonify(json_pitches)
+        json_blogs.append(blog.to_dict())
+    return jsonify(json_blogs)
 
 
 @api.route('/blog/<int:id>', methods=['DELETE'])
-@jwt_required
-def pitch_delete(pitch_id):
-    blog = Blog.query.get(pitch_id)
+# @jwt_required
+def blog_delete(blog_id):
+    blog = Blog.query.get(blog_id)
 
     delete(blog)
     commit()
     return jsonify(blog.to_dict())
 
 
-@api.route('/blog/<int:pitch_id>', methods=['GET'])
-@jwt_required
-def pitch_read(pitch_id):
-    blog = Blog.query.get(pitch_id)
+@api.route('/blog/<int:blog_id>', methods=['GET'])
+# @jwt_required
+def blog_read(blog_id):
+    blog = Blog.query.get(blog_id)
+    if not blog:
+        return jsonify(description="Not found"),404
 
     return jsonify(blog.to_dict())
 
@@ -67,7 +70,7 @@ def comment_create():
 
 
 @api.route('/comment', methods=['GET'])
-@jwt_required
+# @jwt_required
 def comment_index():
     comments = Comment.query.all()
     comment_json = []
@@ -78,7 +81,7 @@ def comment_index():
 
 
 @api.route('/comment/<int:comment_id>', methods=("GET",))
-@jwt_required
+# @jwt_required
 def comment_read(comment_id):
     comment = Comment.query.get(comment_id)
     return jsonify(comment.to_dict())
@@ -107,7 +110,7 @@ def category_create():
 
 
 @api.route('/category', methods=("GET",))
-@jwt_required
+# @jwt_required
 def category_index():
     categories = Category.query.all()
     json_categories = []
@@ -165,16 +168,16 @@ def profile_picture_create():
         return jsonify(profile_picture.to_dict())
 
 
-@api.route('/my_pitches', methods=("GET",))
+@api.route('/my_blogs', methods=("GET",))
 @jwt_required
-def get_user_pitched():
+def get_user_blogs():
     user_id = get_jwt_identity()
     blogs = Blog.query.filter_by(user_id=user_id).all()
-    json_pitches = []
+    json_blogs = []
     for blog in blogs:
-        json_pitches.append(blog.to_dict())
+        json_blogs.append(blog.to_dict())
 
-    return jsonify(json_pitches)
+    return jsonify(json_blogs)
 
 
 @api.route('/user_profile/<int:user_id>')

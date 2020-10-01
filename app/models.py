@@ -62,6 +62,10 @@ class Blog(Model, Common):
         ForeignKey('categories.id'),
         nullable=False
     )
+    title = Column(
+        String,
+        nullable=False
+    )
     author = Relationship(
         'User',
         backref='blogs',
@@ -86,9 +90,12 @@ class Blog(Model, Common):
         'category.name',
         'author.name',
         'author.profile_picture.id',
+        'author.about',
         'author.id',
         "id",
         "content",
+        "title",
+        "CREATED_AT",
         "comments.author.name",
         "comments.author.profile_picture.id",
         "comments.author.id",
@@ -158,7 +165,7 @@ class Comment(Model, Common):
         Text,
         nullable=False
     )
-    pitch_id = Column(
+    blog_id = Column(
         BigInteger,
         ForeignKey('blogs.id'),
         nullable=False
