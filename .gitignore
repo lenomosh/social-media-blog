@@ -5,7 +5,7 @@
 yc
 /app/storage
 __pycache__/
-#instance/
+instance/
 .pytest_cache/
 .coverage
 htmlcov/
