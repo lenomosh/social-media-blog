@@ -110,6 +110,10 @@ class User(Model, Common, UserMixin):
         nullable=False,
         unique=True
     )
+    about = Column(
+        String(250),
+        nullable=True
+    )
     email = Column(
         String(100),
         nullable=False,
@@ -191,9 +195,10 @@ class ProfilePicture(Common, Model):
     )
 
 
-class NewsLetter(Common):
-    user_id = BigInteger(
-        String,
+class NewsLetter(Common,Model):
+    __tablename__ = 'newsletters'
+    user_id = Column(
+        BigInteger,
         ForeignKey('users.id'),
         unique=True,
         nullable=False
